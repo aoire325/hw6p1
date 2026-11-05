@@ -204,3 +204,51 @@ std::string RedBlackTree::ToPostfixString(int node) const {
     return ToPostfixString(nodes[node].left) + ToPostfixString(nodes[node].right)
            + NodeString(node);
 }
+
+int RedBlackTree::CheckSubtree(int node, int parent, long long lower,
+                               long long upper,
+                               unsigned long long int &count) const {
+    if (node == -1) {
+        return 1; // Missing children are black leaves.
+    }
+
+    // Check the index before using it to access the vector.
+    assert(node >= 0 && static_cast<std::size_t>(node) < nodes.size());
+    const RBTNode &current = nodes[node];
+    assert(current.parent == parent);
+    assert(lower < current.data && current.data < upper);
+    assert(current.color == COLOR_RED || current.color == COLOR_BLACK);
+
+    ++count;
+    assert(count <= nodes.size());
+    const int leftHeight = CheckSubtree(current.left, node, lower,
+                                        current.data, count);
+    const int rightHeight = CheckSubtree(current.right, node, current.data,
+                                         upper, count);
+    assert(leftHeight == rightHeight);
+    if (current.color == COLOR_RED) {
+        assert(current.left == -1 || nodes[current.left].color == COLOR_BLACK);
+        assert(current.right == -1 || nodes[current.right].color == COLOR_BLACK);
+    }
+
+    (void)parent;
+    (void)rightHeight;
+    return leftHeight + (current.color == COLOR_BLACK ? 1 : 0);
+}
+
+void RedBlackTree::PrivateTests() const {
+    if (root == -1) {
+        assert(nodes.empty());
+        return;
+    }
+
+    assert(root >= 0 && static_cast<std::size_t>(root) < nodes.size());
+    assert(nodes[root].parent == -1);
+    assert(nodes[root].color == COLOR_BLACK);
+
+    unsigned long long int count = 0;
+    CheckSubtree(root, -1, std::numeric_limits<long long>::lowest(),
+                 std::numeric_limits<long long>::max(), count);
+    // Every allocated node must be reachable exactly once from the root.
+    assert(count == nodes.size());
+}

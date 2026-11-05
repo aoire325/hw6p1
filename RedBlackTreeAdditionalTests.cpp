@@ -10,8 +10,6 @@
 #include <stdexcept>
 #include <vector>
 
-// Additional tests written with OpenAI Codex assistance. The original test
-// files are kept intact so their exact expected structures remain checks too.
 
 template <typename Action>
 void ExpectInvalidArgument(Action action) {

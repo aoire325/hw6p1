@@ -240,6 +240,42 @@ void TestGetMinimumMaximum(){
 
 
 
+void TestPrivateTests(){
+	cout << "Testing Private Methods..." << endl;
+
+	RedBlackTree empty;
+	empty.PrivateTests();
+
+	// Exercise both rotation directions and both inside rotation cases.
+	const int orders[][3] = {
+		{30, 20, 10}, {10, 20, 30},
+		{30, 10, 20}, {10, 30, 20}
+	};
+	for (const auto &order : orders) {
+		RedBlackTree rbt;
+		for (int value : order) {
+			rbt.Insert(value);
+			rbt.PrivateTests();
+		}
+		assert(rbt.ToPrefixString() == " B20  R10  R30 ");
+	}
+
+	// Check links, ordering, colors, and black heights after each repair.
+	RedBlackTree rbt;
+	for (int value : {11, 23, 9, 52, 31, 4, 200, 1, 15, 40}) {
+		rbt.Insert(value);
+		rbt.PrivateTests();
+	}
+	RedBlackTree copy(rbt);
+	copy.PrivateTests();
+	copy.Insert(-5);
+	copy.PrivateTests();
+	rbt.PrivateTests();
+	assert(!rbt.Contains(-5));
+
+	cout << "PASSED!" << endl << endl;
+}
+
 int main(){
 
 	
@@ -259,6 +295,7 @@ int main(){
 
 	TestContains();
 	TestGetMinimumMaximum();
+	TestPrivateTests();
 
 	
 	cout << "ALL TESTS PASSED!!" << endl;
